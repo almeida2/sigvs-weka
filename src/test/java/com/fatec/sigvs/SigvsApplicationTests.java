@@ -61,4 +61,18 @@ class SigvsApplicationTests {
         }
         System.out.println("=================================================");
     }
+
+    @Test
+    void testPredictionServiceClassify() throws Exception {
+        com.fatec.sigvs.model.IrisRequest request = new com.fatec.sigvs.model.IrisRequest();
+        request.setSepalLength(5.1);
+        request.setSepalWidth(3.5);
+        request.setPetalLength(1.4);
+        request.setPetalWidth(0.2);
+
+        com.fatec.sigvs.model.IrisResponse response = predictionService.classify(request);
+        org.junit.jupiter.api.Assertions.assertNotNull(response);
+        org.junit.jupiter.api.Assertions.assertEquals("Iris-setosa", response.getPredictedClass());
+        org.junit.jupiter.api.Assertions.assertTrue(response.getConfidence() > 90.0);
+    }
 }

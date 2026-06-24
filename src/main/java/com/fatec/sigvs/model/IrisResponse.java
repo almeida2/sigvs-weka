@@ -1,4 +1,4 @@
-package com.fatec.sigvs.controller;
+package com.fatec.sigvs.model;
 
 public class IrisResponse {
     private String predictedClass;
