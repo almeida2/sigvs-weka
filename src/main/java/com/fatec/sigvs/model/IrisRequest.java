@@ -1,5 +1,11 @@
 package com.fatec.sigvs.model;
 
+/**
+ * Classe que representa a requisição de classificação de flores Iris
+ * mapeado pelo arquivo json recebido na classe IrisController
+ * 
+ * @see IrisController#classifyFlower(IrisRequest)
+ */
 public class IrisRequest {
     private Double sepalLength;
     private Double sepalWidth;

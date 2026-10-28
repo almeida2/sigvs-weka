@@ -18,6 +18,12 @@ public class PredictionService {
     private Classifier classifier;
     private Instances datasetStructure; // Defines features and labels
 
+    /**
+     * Método de inicialização que carrega o modelo de classificação pré-treinado
+     * é executado logo apos a injeção de dependencias do bean ter sido executadada
+     * 
+     * @throws Exception - dispara uma exception caso o modelo nao seja encontrado
+     */
     @PostConstruct
     public void init() throws Exception {
         // 1. Load the pre-trained Weka model from resources
@@ -31,15 +37,32 @@ public class PredictionService {
         this.datasetStructure = createDatasetStructure();
     }
 
+    /**
+     * Recebe um array de valores de entrada e retorna a classe prevista para a
+     * florIris
+     * 
+     * @param featureValues - array de valores de entrada
+     * @return - valor da classe prevista
+     * @throws Exception - dispara uma exceção caso a predição falhe
+     */
     public double predict(double[] featureValues) throws Exception {
-        // Create an instance bound to the dataset structure
+        // Cria uma instancia com os valores de entrada
+        // calcula a distancia por similaridade de coseno
         DenseInstance instance = new DenseInstance(1.0, featureValues);
+        // Define a estrutura do dataset
         instance.setDataset(datasetStructure);
-
-        // Perform prediction (returns class index or numerical value)
+        // Realiza a predição
         return classifier.classifyInstance(instance);
     }
 
+    /**
+     * Recebe um objeto IrisRequest e retorna um objeto IrisResponse com a classe
+     * prevista
+     * 
+     * @param request - objeto IrisRequest com os valores de entrada
+     * @return - objeto IrisResponse com a classe prevista
+     * @throws Exception - dispara uma exceção caso a predição falhe
+     */
     public IrisResponse classify(IrisRequest request) throws Exception {
         // 1. Criar a estrutura do Dataset e Instância
         Instances dataset = createDatasetStructure();
@@ -73,7 +96,8 @@ public class PredictionService {
     }
 
     /**
-     * Auxiliar para definir a estrutura do dataset de acordo com as especificações do Weka.
+     * Auxiliar para definir a estrutura do dataset de acordo com as especificações
+     * do Weka.
      */
     private Instances createDatasetStructure() {
         ArrayList<Attribute> attributes = new ArrayList<>();
