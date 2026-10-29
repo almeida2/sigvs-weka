@@ -16,11 +16,14 @@ import java.util.List;
 public class PredictionService {
 
     private Classifier classifier;
-    private Instances datasetStructure; // Defines features and labels
+    // Representa todo o dataset e uma coleção ordenada de instancias
+    private Instances datasetStructure;
 
     /**
      * Método de inicialização que carrega o modelo de classificação pré-treinado
      * é executado logo apos a injeção de dependencias do bean ter sido executadada
+     * Chama o método interno createDatasetStructure() para instanciar e guardar a
+     * estrutura de atributos (datasetStructure) que será exigida pelas predições.
      * 
      * @throws Exception - dispara uma exception caso o modelo nao seja encontrado
      */
@@ -57,26 +60,28 @@ public class PredictionService {
 
     /**
      * Recebe um objeto IrisRequest e retorna um objeto IrisResponse com a classe
-     * prevista
+     * prevista.
+     * Utiliza a estrutura do dataset já carregada na inicialização do serviço.
      * 
      * @param request - objeto IrisRequest com os valores de entrada
-     * @return - objeto IrisResponse com a classe prevista
+     * @return IrisResponse com a classe prevista e a confiança
      * @throws Exception - dispara uma exceção caso a predição falhe
      */
     public IrisResponse classify(IrisRequest request) throws Exception {
-        // 1. Criar a estrutura do Dataset e Instância
-        Instances dataset = createDatasetStructure();
+        // 1. Criar a instância densa associada à estrutura previamente carregada
         DenseInstance instance = new DenseInstance(5);
-        instance.setValue(dataset.attribute(0), request.getSepalLength());
-        instance.setValue(dataset.attribute(1), request.getSepalWidth());
-        instance.setValue(dataset.attribute(2), request.getPetalLength());
-        instance.setValue(dataset.attribute(3), request.getPetalWidth());
-        instance.setDataset(dataset);
+        instance.setDataset(this.datasetStructure);
 
-        // 2. Obter a distribuição de probabilidades
+        // 2. Definir os valores dos atributos de entrada
+        instance.setValue(this.datasetStructure.attribute(0), request.getSepalLength());
+        instance.setValue(this.datasetStructure.attribute(1), request.getSepalWidth());
+        instance.setValue(this.datasetStructure.attribute(2), request.getPetalLength());
+        instance.setValue(this.datasetStructure.attribute(3), request.getPetalWidth());
+
+        // 3. Obter a distribuição de probabilidades do modelo
         double[] distribution = classifier.distributionForInstance(instance);
 
-        // 3. Encontrar o índice com a maior probabilidade
+        // 4. Encontrar a classe com maior probabilidade
         int maxIndex = 0;
         double maxConfidence = 0.0;
         for (int i = 0; i < distribution.length; i++) {
@@ -86,8 +91,8 @@ public class PredictionService {
             }
         }
 
-        // 4. Obter a espécie correspondente
-        String predictedClass = dataset.classAttribute().value(maxIndex);
+        // 5. Retornar a resposta com o nome da classe e a confiança
+        String predictedClass = this.datasetStructure.classAttribute().value(maxIndex);
         return new IrisResponse(predictedClass, maxConfidence);
     }
 
@@ -97,7 +102,9 @@ public class PredictionService {
 
     /**
      * Auxiliar para definir a estrutura do dataset de acordo com as especificações
-     * do Weka.
+     * do Weka. Monta a estrutura que o modelo treinado esperando receber
+     * (4 atributos numéricos para as medidas da flor e 1 atributo nominal para a
+     * classe/espécie).
      */
     private Instances createDatasetStructure() {
         ArrayList<Attribute> attributes = new ArrayList<>();

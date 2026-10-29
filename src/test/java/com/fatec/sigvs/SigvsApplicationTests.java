@@ -20,8 +20,13 @@ class SigvsApplicationTests {
     void contextLoads() {
     }
 
+    /**
+     * Diagnostico e calibração do modelo de ML
+     * 
+     * @throws Exception
+     */
     @Test
-    void testClassifier() throws Exception {
+    void ct01_testClassifier() throws Exception {
         System.out.println("=================================================");
         System.out.println("CLASSIFIER CLASS: " + predictionService.getClassifier().getClass().getName());
         System.out.println("CLASSIFIER DETAILS:\n" + predictionService.getClassifier());
@@ -33,15 +38,16 @@ class SigvsApplicationTests {
         attributes.add(new Attribute("sepalwidth"));
         attributes.add(new Attribute("petallength"));
         attributes.add(new Attribute("petalwidth"));
-        attributes.add(new Attribute("class", new ArrayList<>(List.of("Iris-setosa", "Iris-versicolor", "Iris-virginica"))));
+        attributes.add(
+                new Attribute("class", new ArrayList<>(List.of("Iris-setosa", "Iris-versicolor", "Iris-virginica"))));
 
         Instances dataset = new Instances("IrisDataset", attributes, 0);
         dataset.setClassIndex(dataset.numAttributes() - 1);
 
         double[][] testInputs = {
-            {5.1, 3.5, 1.4, 0.2}, // Setosa
-            {6.0, 2.9, 4.5, 1.5}, // Versicolor
-            {6.5, 3.0, 5.8, 2.2}  // Virginica
+                { 5.1, 3.5, 1.4, 0.2 }, // Setosa
+                { 6.0, 2.9, 4.5, 1.5 }, // Versicolor
+                { 6.5, 3.0, 5.8, 2.2 } // Virginica
         };
 
         for (double[] inputs : testInputs) {
@@ -62,8 +68,14 @@ class SigvsApplicationTests {
         System.out.println("=================================================");
     }
 
+    /**
+     * Validar o contrato e a lógica da camada de serviço (PredictionService),
+     * e o retorno da API/Controller.
+     * 
+     * @throws Exception
+     */
     @Test
-    void testPredictionServiceClassify() throws Exception {
+    void ct02_testPredictionServiceClassify() throws Exception {
         com.fatec.sigvs.model.IrisRequest request = new com.fatec.sigvs.model.IrisRequest();
         request.setSepalLength(5.1);
         request.setSepalWidth(3.5);
